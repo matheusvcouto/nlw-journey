@@ -42,7 +42,7 @@ export const create_trip = new Elysia()
     }
 
     const { trip_id, participant_id } = await db.transaction(async tx => {
-      const [trip] = await db.insert(tb.trips).values({
+      const [trip] = await tx.insert(tb.trips).values({
         destination,
         starts_at: dayjs(starts_at).toDate(),
         ends_at: dayjs(ends_at).toDate()
@@ -53,7 +53,7 @@ export const create_trip = new Elysia()
         throw new Error('Não foi possivel criar a viagem')
       }
       
-      const [participant] = await db.insert(tb.participants).values({
+      const [participant] = await tx.insert(tb.participants).values({
         trip_id: trip.id,
         is_owner: true,
         user_id,
