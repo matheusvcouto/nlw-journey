@@ -5,7 +5,7 @@ import { participants } from './participants';
 
 export const users = pgTable('users', {
   id: text('id').primaryKey().notNull().$defaultFn(ulid),
-  name: text('name').notNull(),
+  name: text('name'),
   email: text('email').notNull().unique(),
   updatedAt: timestamp('updated_at').notNull()
     .default(sql`CURRENT_TIMESTAMP`)

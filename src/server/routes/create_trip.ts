@@ -11,7 +11,8 @@ export const create_trip = new Elysia()
       ends_at,
       owner_email,
       owner_name,
-      starts_at
+      starts_at,
+      emails_to_invite
     } = body
 
     if (dayjs(starts_at).isBefore(new Date)) {
@@ -68,6 +69,15 @@ export const create_trip = new Elysia()
       return { trip_id: trip.id, participant_id: participant.id }
     })
 
+    const users = await db.insert(tb.users).values(emails_to_invite.map(email => ({
+      email,
+    }))).returning({ id: tb.users.id })
+
+    await db.insert(tb.participants).values(users.map(user => ({
+      trip_id,
+      user_id: user.id
+    })))
+
     const message = await sendEmail({
       to: {
         name: owner_name,
@@ -93,7 +103,8 @@ export const create_trip = new Elysia()
       starts_at: t.String({format: 'date-time'}),
       ends_at: t.String({format: 'date-time'}),
       owner_name: t.String(),
-      owner_email: t.String({ format: 'email' })
+      owner_email: t.String({ format: 'email' }),
+      emails_to_invite: t.Array(t.String({ format: 'email' }))
     })
   })
 
