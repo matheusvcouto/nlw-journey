@@ -5,7 +5,7 @@ import { sendEmail } from "~/lib/mail";
 import { getTestMessageUrl } from 'nodemailer' 
 
 export const create_trip = new Elysia()
-  .post('trips', async ({ body, set }) => {
+  .post('trips', async ({ body }) => {
     const {
       destination,
       ends_at,
