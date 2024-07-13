@@ -41,22 +41,31 @@ export const create_trip = new Elysia()
       user_id = user.id
     }
 
-    const [trip] = await db.insert(tb.trips).values({
-      destination,
-      starts_at: dayjs(starts_at).toDate(),
-      ends_at: dayjs(ends_at).toDate()
-    }).returning()
+    const { trip_id, participant_id } = await db.transaction(async tx => {
+      const [trip] = await db.insert(tb.trips).values({
+        destination,
+        starts_at: dayjs(starts_at).toDate(),
+        ends_at: dayjs(ends_at).toDate()
+      }).returning()
+      
+      
+      if (!trip) {
+        throw new Error('Não foi possivel criar a viagem')
+      }
+      
+      const [participant] = await db.insert(tb.participants).values({
+        trip_id: trip.id,
+        is_owner: true,
+        user_id,
+      }).returning({
+        id: tb.participants.id
+      })
+
+      if (!participant) {
+        throw new Error('Não foi possivel criar a viagem')
+      }
     
-    
-    if (!trip) {
-      set.status = 400
-      return { error: 'Ocorreu um problema ao criar a viagem' }
-    }
-    
-    await db.insert(tb.participants).values({
-      trip_id: trip.id,
-      is_owner: true,
-      user_id,
+      return { trip_id: trip.id, participant_id: participant.id }
     })
 
     const message = await sendEmail({
@@ -70,9 +79,11 @@ export const create_trip = new Elysia()
       `
     })
 
+    console.log(getTestMessageUrl(message))
+
     return {
-      tripId: trip.id,
-      url: getTestMessageUrl(message)
+      trip_id,
+      participant_id,
     }
 
   }, {
