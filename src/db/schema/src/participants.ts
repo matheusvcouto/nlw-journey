@@ -1,12 +1,14 @@
-import { pgTable, serial, text, integer, boolean, timestamp } from 'drizzle-orm/pg-core';
-import { relations, sql } from 'drizzle-orm';
+import { pgTable, text, boolean } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 import { ulid } from 'ulid';
 import { trips } from './trips';
 import { users } from './users';
 
 export const participants = pgTable('participants', {
   id: text('id').primaryKey().notNull().$defaultFn(ulid),
-  user_id: text('user_id').notNull().references(() => users.id),
+  user_id: text('user_id').notNull().references(() => users.id, {
+    onDelete: 'cascade'
+  }),
   is_confirmed : boolean('is_confirmed ').notNull().default(false),
   is_owner: boolean('is_owner').notNull().default(false),
 

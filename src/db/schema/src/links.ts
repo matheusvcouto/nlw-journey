@@ -1,5 +1,5 @@
-import { pgTable, serial, text, integer, boolean, timestamp } from 'drizzle-orm/pg-core';
-import { relations, sql, Relation } from 'drizzle-orm';
+import { pgTable, text } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 import { ulid } from 'ulid';
 import { trips } from './trips';
 
@@ -8,7 +8,9 @@ export const links = pgTable('links', {
   title: text('title').notNull(),
   url: text('url').notNull(),
 
-  trip_id: text('trip_id').notNull().references(() => trips.id), 
+  trip_id: text('trip_id').notNull().references(() => trips.id, {
+    onDelete: 'cascade'
+  }), 
 });
 
 export const linksRelations = relations(links, ({ one, many }) => ({

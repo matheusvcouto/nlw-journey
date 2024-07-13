@@ -1,5 +1,5 @@
-import { pgTable, serial, text, integer, boolean, timestamp } from 'drizzle-orm/pg-core';
-import { relations, sql } from 'drizzle-orm';
+import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 import { ulid } from 'ulid';
 import { trips } from './trips';
 
@@ -8,7 +8,9 @@ export const activities = pgTable('activities', {
   title: text('title').notNull(),
   occurs_at: timestamp('occurs_at').notNull(),
 
-  trip_id: text('trip_id').notNull().references(() => trips.id),
+  trip_id: text('trip_id').notNull().references(() => trips.id, {
+    onDelete: 'cascade'
+  }),
 });
 
 export const activitiesRelations = relations(activities, ({ one, many }) => ({

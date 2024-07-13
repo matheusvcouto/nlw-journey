@@ -2,7 +2,7 @@ import Elysia, { t } from "elysia";
 import { db, eq, tb } from "~/db";
 import { dayjs } from '~/lib/dayjs';
 import { sendEmail } from "~/lib/mail";
-import { getTestMessageUrl } from 'nodemailer' 
+import { getTestMessageUrl } from 'nodemailer'
 
 export const create_trip = new Elysia()
   .post('trips', async ({ body }) => {
@@ -12,7 +12,7 @@ export const create_trip = new Elysia()
       owner_email,
       owner_name,
       starts_at,
-      emails_to_invite
+      // emails_to_invite
     } = body
 
     if (dayjs(starts_at).isBefore(new Date)) {
@@ -48,12 +48,12 @@ export const create_trip = new Elysia()
         starts_at: dayjs(starts_at).toDate(),
         ends_at: dayjs(ends_at).toDate()
       }).returning()
-      
-      
+
+
       if (!trip) {
         throw new Error('Não foi possivel criar a viagem')
       }
-      
+
       const [participant] = await tx.insert(tb.participants).values({
         trip_id: trip.id,
         is_owner: true,
@@ -65,18 +65,9 @@ export const create_trip = new Elysia()
       if (!participant) {
         throw new Error('Não foi possivel criar a viagem')
       }
-    
+
       return { trip_id: trip.id, participant_id: participant.id }
     })
-
-    const users = await db.insert(tb.users).values(emails_to_invite.map(email => ({
-      email,
-    }))).returning({ id: tb.users.id })
-
-    await db.insert(tb.participants).values(users.map(user => ({
-      trip_id,
-      user_id: user.id
-    })))
 
     const message = await sendEmail({
       to: {
@@ -104,7 +95,7 @@ export const create_trip = new Elysia()
       ends_at: t.String({format: 'date-time'}),
       owner_name: t.String(),
       owner_email: t.String({ format: 'email' }),
-      emails_to_invite: t.Array(t.String({ format: 'email' }))
+      // emails_to_invite: t.Array(t.String({ format: 'email' }))
     })
   })
 
@@ -113,4 +104,3 @@ export const create_trip = new Elysia()
 //   "starts_at": "2025-09-12 10:50",
 //   "ends_at": "2025-09-13 10:50"
 // }
-  
