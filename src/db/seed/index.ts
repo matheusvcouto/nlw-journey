@@ -1,4 +1,4 @@
-import { db, tb } from ".."
+import { db, eq, tb } from ".."
 
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
@@ -32,7 +32,7 @@ const seed = async () => {
       }
     ]).returning();
 
-    if (!trip || !users) {
+    if (!trip || !users || !users[0]) {
       return
     }
 
@@ -41,9 +41,13 @@ const seed = async () => {
       user_id: user.id
     })))
 
+    await db.update(tb.participants).set({
+      is_owner: true
+    }).where(eq(tb.participants.id, users[0].id))
+
     console.log('Finalizou')
     process.exit()
-    
+
   } catch (error) {
     console.log('Ocorreu um error', error)
   }
