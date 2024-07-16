@@ -26,7 +26,7 @@ const seed = async () => {
 
     const [trip] = await db.insert(tb.trips).values([
       {
-        destination: 'Dubai',
+        destination: 'São paulo',
         ends_at: addDays(new Date, 10),
         starts_at: addDays(new Date, 4)
       }
@@ -43,7 +43,7 @@ const seed = async () => {
 
     await db.update(tb.participants).set({
       is_owner: true
-    }).where(eq(tb.participants.id, users[0].id))
+    }).where(eq(tb.participants.user_id, users[0].id)).returning()
 
     console.log('Finalizou')
     process.exit()
