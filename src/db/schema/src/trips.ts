@@ -5,7 +5,6 @@ import { participants } from './participants';
 import { activities } from './activities';
 import { links } from './links';
 
-// viagens
 export const trips = pgTable('trips', {
   id: text('id').primaryKey().notNull().$defaultFn(ulid),
   destination: text('destination').notNull(),

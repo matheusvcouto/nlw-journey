@@ -11,12 +11,13 @@ export const participants = pgTable('participants', {
   }),
   is_confirmed : boolean('is_confirmed ').notNull().default(false),
   is_owner: boolean('is_owner').notNull().default(false),
-
-  trip_id: text('trip_id').notNull().references(() => trips.id),
+  trip_id: text('trip_id').notNull().references(() => trips.id, {
+    onDelete: 'cascade'
+  }),
 });
 
 export const participantsRelations = relations(participants, ({ one, many }) => ({
-  tryp: one(trips, {
+  trip: one(trips, {
     fields: [participants.trip_id],
     references: [trips.id]
   }),
